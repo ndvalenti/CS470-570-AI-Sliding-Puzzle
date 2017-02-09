@@ -12,7 +12,6 @@ private:
     struct board
     {
         int16_t *tile;
-        board *parent;
 
         ~board(){
             // TODO: Determine how to handle tracking of parents
@@ -21,6 +20,7 @@ private:
             tile = NULL;
         }
     };
+    slideBoard *parent;
     board *gameboard;
 
     // Stores the index of the empty tile
@@ -35,22 +35,18 @@ private:
 
     // Initializes to "solved" position
     void initializeBoard();
+    void initializeBoard(slideBoard temp);
 
     void setMoves();
 
     bool move(int16_t x);
-
-    // Checks if the current board is the same as s or is the default
-    // solution state if no argument supplied
-    // Uses std::vector to safely check bounds of s
-    bool equals();
-    bool equals(std::vector<int16_t> s);
 
 
 public:
     // Constructs a board with width and height x, defaults to 3
     slideBoard();
     slideBoard(int32_t x);
+    slideBoard(slideBoard temp);
 
     ~slideBoard()
     {
@@ -65,6 +61,11 @@ public:
     void randomize();
     void print();
 
+    // Checks if the current board is the same as s or is the default
+    // solution state if no argument supplied
+    // Uses std::vector to safely check bounds of s
+    bool equals();
+    bool equals(std::vector<int16_t> s);
 };
 
 #endif // SLIDEBOARD_H

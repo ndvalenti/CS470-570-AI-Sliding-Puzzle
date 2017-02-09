@@ -13,6 +13,11 @@ slideBoard::slideBoard(int32_t x) : WIDTH(x)
     initializeBoard();
 }
 
+slideBoard::slideBoard(slideBoard temp) : WIDTH(temp.WIDTH)
+{
+    initializeBoard(temp);
+}
+
 void slideBoard::initializeBoard()
 {
     size = WIDTH * WIDTH;
@@ -22,7 +27,7 @@ void slideBoard::initializeBoard()
 
     gameboard = new board();
 
-    gameboard->parent = NULL;
+    parent = NULL;
     gameboard->tile = new int16_t[size];
 
     for (int i = 0; i < size; i++) {
@@ -32,8 +37,24 @@ void slideBoard::initializeBoard()
     setMoves();
 }
 
+void slideBoard::initializeBoard(temp)
+{
+    size = WIDTH * WIDTH;
+    srand(time(NULL));
+    emptyPos = temp.emptyPos;
+
+    gameboard = new board();
+
+    parent = &temp;
+    gameboard->tile = new int16_t[size];
+
+    for (int i = 0; i < size; i++) {
+        gameboard->tile[i] = temp.gameboard->tile[i];
+    }
+    setMoves();
+}
+
 void slideBoard::print() {
-    std::cout << "Current Gameboard:\n";
     for (int i = 0; i < size; i++){
         if (i % WIDTH == 0){
             std::cout << "\n";
@@ -80,8 +101,8 @@ void slideBoard::getMoves()
 void slideBoard::play()
 {
     int16_t x;
-    randomize();
     while (!equals()) {
+        std::cout << "Current Gameboard:\n";
         print();
         getMoves();
         std::cin >> x;
