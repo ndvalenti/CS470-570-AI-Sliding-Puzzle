@@ -1,11 +1,28 @@
+// Nick Valenti
+// CS 470/570 AI
+// Assignment 1 Part 2
+// slideboard.cpp
+
 #include "slideboard.h"
 #include <iomanip>
 #include <time.h>
 #include <stdlib.h>
+#include <vector>
+#include <algorithm>
+#include <iterator>
 
 slideBoard::slideBoard() : WIDTH(3)
 {
     initializeBoard();
+}
+
+slideBoard::slideBoard(int32_t x, bool fill) : WIDTH(x)
+{
+    if (fill == false){
+        initializeBoardf();
+    } else {
+        initializeBoard();
+    }
 }
 
 slideBoard::slideBoard(int32_t x) : WIDTH(x)
@@ -13,9 +30,18 @@ slideBoard::slideBoard(int32_t x) : WIDTH(x)
     initializeBoard();
 }
 
-slideBoard::slideBoard(slideBoard temp) : WIDTH(temp.WIDTH)
+slideBoard::slideBoard(slideBoard &temp) : WIDTH(temp.WIDTH)
 {
     initializeBoard(temp);
+}
+
+void slideBoard::initializeBoardf()
+{
+    size = WIDTH * WIDTH;
+    emptyPos = 0;
+
+    gameboard = new board();
+    gameboard->tile = new int16_t[size];
 }
 
 void slideBoard::initializeBoard()
@@ -24,10 +50,10 @@ void slideBoard::initializeBoard()
     srand(time(NULL));
     int16_t count = 0;
     emptyPos = 0;
+    parent = NULL;
 
     gameboard = new board();
 
-    parent = NULL;
     gameboard->tile = new int16_t[size];
 
     for (int i = 0; i < size; i++) {
@@ -37,15 +63,15 @@ void slideBoard::initializeBoard()
     setMoves();
 }
 
-void slideBoard::initializeBoard(temp)
+void slideBoard::initializeBoard(slideBoard &temp)
 {
     size = WIDTH * WIDTH;
     srand(time(NULL));
     emptyPos = temp.emptyPos;
+    parent = temp.parent;
 
     gameboard = new board();
 
-    parent = &temp;
     gameboard->tile = new int16_t[size];
 
     for (int i = 0; i < size; i++) {
@@ -65,25 +91,30 @@ void slideBoard::print() {
             std::cout << "   ";
         }
     }
-    std::cout << std::endl;
+    std::cout << "\n\n";
 }
 
 void slideBoard::setMoves()
 {
-    for (int i = 0; i < 4; i++){
-        moves[i] = -1;
-    }
     if (emptyPos - WIDTH >= 0){
         moves[0] = emptyPos - WIDTH;
+    } else {
+        moves[0] = -1;
     }
     if ((emptyPos + 1) % WIDTH != 0) {
         moves[1] = emptyPos + 1;
+    } else {
+        moves[1] = -1;
     }
     if ((emptyPos + WIDTH) < (size)) {
         moves[2] = emptyPos + WIDTH;
+    } else {
+        moves[2] = -1;
     }
     if (emptyPos % WIDTH != 0) {
         moves[3] = emptyPos - 1;
+    } else {
+        moves[3] = -1;
     }
 }
 
@@ -109,7 +140,20 @@ void slideBoard::play()
         move(x);
     }
     print();
-    std::cout << "Congratulations!" << std::endl;
+    std::cout << "\nCongratulations!" << std::endl;
+}
+
+void slideBoard::play(std::vector<int16_t> path)
+{
+    for (int i = path.size() - 1; i >= 0; i--){
+        std::cout << "Current Gameboard:\n";
+        print();
+    std::cout << "\nPress any key to execute the next move (" << path[i] << ")\n";
+        std::cin.ignore();
+        move(path[i]);
+    }
+    print();
+    std::cout << "\nThe puzzle is solved." << std::endl;
 }
 
 void slideBoard::randomize()
@@ -117,13 +161,44 @@ void slideBoard::randomize()
     int16_t i = 0;
     int16_t attempt;
 
-    while (i < WIDTH * 1000){
+    while (i < WIDTH * 100){
             // attempts to move n,e,s,w based on moves[] array
         attempt = rand() % 4;
         if (move(moves[attempt]+1)){
             i++;
         }
     }
+}
+
+bool slideBoard::compare(slideBoard *s)
+{
+    if (memcmp(s->gameboard->tile, gameboard->tile, sizeof(int16_t) * size) != 0){
+        return false;
+    }
+    return true;
+}
+
+bool slideBoard::compare(int16_t *s)
+{
+    if (memcmp(s, gameboard->tile, sizeof(int16_t) * size) != 0){
+        return false;
+    }
+    return true;
+}
+
+void slideBoard::fauxmove(int16_t *s, int16_t x)
+{
+    memcpy(s, gameboard->tile, sizeof(int16_t) * size);
+
+    x--;
+    int16_t temp = s[x];
+    s[x] = s[emptyPos];
+    s[emptyPos] = temp;
+}
+
+int16_t slideBoard::getsize()
+{
+    return size;
 }
 
 bool slideBoard::equals()
@@ -164,4 +239,31 @@ bool slideBoard::move(int16_t x)
         }
     }
     return false;
+}
+
+void slideBoard::movef(int16_t x)
+{
+    x--;
+    int16_t temp = gameboard->tile[x];
+    gameboard->tile[x] = gameboard->tile[emptyPos];
+    gameboard->tile[emptyPos] = temp;
+    emptyPos = x;
+    setMoves();
+}
+
+slideBoard *slideBoard::spawn(int16_t x)
+{
+    slideBoard *sbnew = new slideBoard(WIDTH);
+
+    for (int i = 0; i < size; i++) {
+        sbnew->gameboard->tile[i] = gameboard->tile[i];
+    }
+    sbnew->emptyPos = emptyPos;
+    sbnew->setMoves();
+
+    sbnew->parent = this;
+    sbnew->path = x;
+    sbnew->movef(x);
+
+    return sbnew;
 }

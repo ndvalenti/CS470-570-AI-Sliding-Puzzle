@@ -9,4 +9,9 @@ CONFIG -= app_bundle
 
 TEMPLATE = app
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    slideboard.cpp \
+    search.cpp
+
+HEADERS += slideboard.h \
+    search.h
