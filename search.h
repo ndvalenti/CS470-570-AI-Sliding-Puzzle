@@ -19,4 +19,9 @@ void solveBF(slideBoard &original, std::vector<int16_t> &path);
 // Breadth first closed list, populates path with the solution in reverse order
 void solveBFC(slideBoard &original, std::vector<int16_t> &path);
 
+// Depth first search
+void solveDFS(slideBoard &original, std::vector<int16_t> &path);
+
+void DFSRecurse(slideBoard *curr, std::list<slideBoard*> DFStack, std::list<slideBoard*> Closed, int16_t *comparr);
+
 #endif // SEARCH_H

@@ -161,7 +161,7 @@ void slideBoard::randomize()
     int16_t i = 0;
     int16_t attempt;
 
-    while (i < WIDTH * 100){
+    while (i < WIDTH * 1){
             // attempts to move n,e,s,w based on moves[] array
         attempt = rand() % 4;
         if (move(moves[attempt]+1)){

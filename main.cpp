@@ -18,6 +18,11 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
     std::vector<int16_t> path;
 
+    slideBoard test;
+    test.randomize();
+    test.print();
+    solveDFS(test, path);
+
 /*
     slideBoard test;
 
@@ -31,7 +36,7 @@ int main(int argc, char *argv[])
     solveBFC(test, path);
     test.play(path);
 
-*/
+
     std::cout << "Solving 10 n-puzzles of size 3 after 300 random LEGAL moves:\n\n";
     for (int i = 1; i <= 10; i++){
         std::cout << "Attempt " << i << std::endl;
@@ -42,7 +47,7 @@ int main(int argc, char *argv[])
         path.clear();
         Sleep(1000);
     }
-
+*/
     return a.exec();
 }
 
