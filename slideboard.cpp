@@ -16,15 +16,6 @@ slideBoard::slideBoard() : WIDTH(3)
     initializeBoard();
 }
 
-slideBoard::slideBoard(int32_t x, bool fill) : WIDTH(x)
-{
-    if (fill == false){
-        initializeBoardf();
-    } else {
-        initializeBoard();
-    }
-}
-
 slideBoard::slideBoard(int32_t x) : WIDTH(x)
 {
     initializeBoard();
@@ -35,15 +26,6 @@ slideBoard::slideBoard(slideBoard &temp) : WIDTH(temp.WIDTH)
     initializeBoard(temp);
 }
 
-void slideBoard::initializeBoardf()
-{
-    size = WIDTH * WIDTH;
-    emptyPos = 0;
-
-    gameboard = new board();
-    gameboard->tile = new int16_t[size];
-}
-
 void slideBoard::initializeBoard()
 {
     size = WIDTH * WIDTH;
@@ -51,6 +33,7 @@ void slideBoard::initializeBoard()
     int16_t count = 0;
     emptyPos = 0;
     parent = NULL;
+    step = 0;
 
     gameboard = new board();
 
@@ -69,8 +52,10 @@ void slideBoard::initializeBoard(slideBoard &temp)
     srand(time(NULL));
     emptyPos = temp.emptyPos;
     parent = temp.parent;
-
+    path = temp.path;
+    fitness = temp.fitness;
     gameboard = new board();
+    step = temp.step;
 
     gameboard->tile = new int16_t[size];
 
@@ -161,13 +146,66 @@ void slideBoard::randomize()
     int16_t i = 0;
     int16_t attempt;
 
-    while (i < WIDTH * 1){
+    while (i < WIDTH * 100){
             // attempts to move n,e,s,w based on moves[] array
         attempt = rand() % 4;
         if (move(moves[attempt]+1)){
             i++;
         }
     }
+}
+
+void slideBoard::randomize1()
+{
+    gameboard->tile[0] = 6;
+    gameboard->tile[1] = 4;
+    gameboard->tile[2] = 1;
+    gameboard->tile[3] = 3;
+    gameboard->tile[4] = 7;
+    gameboard->tile[5] = 2;
+    gameboard->tile[6] = 8;
+    gameboard->tile[7] = 5;
+    gameboard->tile[8] = 0;
+    emptyPos = 8;
+    setMoves();
+}
+
+int16_t slideBoard::getFitness()
+{
+    return fitness;
+}
+
+void slideBoard::setFitness1()
+{
+    fitness = 1;
+    for (int i = 0; i < size; i++)
+    {
+        if (gameboard->tile[i] != i)
+        {
+            fitness++;
+        }
+    }
+    fitness += step;
+}
+
+void slideBoard::setFitness2()
+{
+    fitness = 1;
+    for (int i = 0; i < size; i++)
+    {
+        fitness += abs(gameboard->tile[i]/WIDTH - i/WIDTH) + abs(gameboard->tile[i]%WIDTH - i%WIDTH);
+    }
+    fitness += step;
+}
+
+void slideBoard::setFitness3()
+{
+    fitness = 1;
+    for (int i = 0; i < size; i++)
+    {
+        fitness += abs(gameboard->tile[i]/WIDTH - i/WIDTH) + abs(gameboard->tile[i]%WIDTH - i%WIDTH);
+    }
+    fitness += step;
 }
 
 bool slideBoard::compare(slideBoard *s)
@@ -263,6 +301,7 @@ slideBoard *slideBoard::spawn(int16_t x)
 
     sbnew->parent = this;
     sbnew->path = x;
+    sbnew->step = step + 1;
     sbnew->movef(x);
 
     return sbnew;

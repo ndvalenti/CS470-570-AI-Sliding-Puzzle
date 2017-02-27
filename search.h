@@ -22,6 +22,15 @@ void solveBFC(slideBoard &original, std::vector<int16_t> &path);
 // Depth first search
 void solveDFS(slideBoard &original, std::vector<int16_t> &path);
 
-void DFSRecurse(slideBoard *curr, std::list<slideBoard*> DFStack, std::list<slideBoard*> Closed, int16_t *comparr);
+// Iterative Deepening
+void solveID(slideBoard &original, std::vector<int16_t> &path);
+
+// A* Searches
+// Out of place Heuristic
+void solveAStarOne(slideBoard &original, std::vector<int16_t> &path);
+// Manhattan Distance Heuristic
+void solveAStarTwo(slideBoard &original, std::vector<int16_t> &path);
+
+void solveIDA(slideBoard &original, std::vector<int16_t> &path);
 
 #endif // SEARCH_H

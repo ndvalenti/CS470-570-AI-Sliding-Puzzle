@@ -6,6 +6,7 @@
 #ifndef SLIDEBOARD_H
 #define SLIDEBOARD_H
 #include <iostream>
+#include <memory>
 #include <vector>
 
 class slideBoard
@@ -14,15 +15,16 @@ private:
     const int32_t WIDTH;
     int16_t size;
 
-    slideBoard(int32_t x, bool fill);
+    // Fitness of this board is calculated once and only set if used
+    int16_t fitness;
+
+    //int16_t step;
 
     struct board
     {
         int16_t *tile;
 
         ~board(){
-            // TODO: Determine how to handle tracking of parents
-            // before starting searches
             delete [] tile;
             tile = NULL;
         }
@@ -37,8 +39,8 @@ private:
 
     // Initializes to "solved" position
     void initializeBoard();
+    // Copy constructor
     void initializeBoard(slideBoard &temp);
-    void initializeBoardf();
 
     void setMoves();
 
@@ -56,15 +58,28 @@ public:
 
     ~slideBoard()
     {
-        // ONGOING: Keep track of dynamically allocated memory
-        // individual boards currently responsible for deallocating their own memory
         delete gameboard;
     }
 
+        int16_t step;
+
+    int16_t getFitness();
+
+    // Out of place Heuristic
+    void setFitness1();
+
+    // Manhattan Distance Heuristic
+    void setFitness2();
+
+    // Running total fitness, for use with IDA*, not yet implemented
+    void setFitness3();
+
+    // Calling this plays the game normally
     void play();
     void play(std::vector<int16_t> path);
 
-    // Makes 1000 * WIDTH random valid moves
+    // Makes 100 * WIDTH random valid moves
+    void randomize1();
     void randomize();
     void print();
 
@@ -72,6 +87,7 @@ public:
     bool compare(slideBoard *s);
     bool compare(int16_t *s);
 
+    // Returns size
     int16_t getsize();
 
 
@@ -79,20 +95,22 @@ public:
     void fauxmove(int16_t *s, int16_t x);
 
     // Checks if the current board is the same as s or is the default
-    // solution state if no argument supplied
+    // solution state if no argument supplied, returns true if equal
     // Uses std::vector to safely check bounds of s
     bool equals();
     bool equals(std::vector<int16_t> s);
 
-    // Spawns a child copy and returns a pointer to it
+    // Allocates a child copy and returns a pointer to it
     slideBoard *spawn(int16_t x);
 
     // Indicies track whether N,E,S,W are valid moves respectively
     // Will be -1 if invalid, index of available move if valid
     int16_t moves[4];
+
+    // Keeps track of the move that got it here
     int16_t path;
+    // Pointer to the board that spawned this one
     slideBoard *parent;
-    //std::vector<int16_t> path;
 };
 
 #endif // SLIDEBOARD_H
